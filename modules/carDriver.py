@@ -44,6 +44,7 @@ class carDriver(Sequential):
             self.add(Dropout(self.convDropout))
         # flatten layer
         self.add(Flatten())
+        # fully connected layers
         for i, n in enumerate(self.FC):
             self.add(Dense(n, activation = 'relu'))
             self.add(BatchNormalization())

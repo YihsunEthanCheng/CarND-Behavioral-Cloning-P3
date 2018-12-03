@@ -9,7 +9,6 @@ Created on Sun Dec  2 23:16:39 2018
 from sklearn.model_selection import train_test_split
 import cv2
 import numpy as np
-import sklearn
 import pandas as pd
 from sklearn.utils import shuffle
 
@@ -30,7 +29,7 @@ def generator(df, batch_size=32, dataPath = 'data/'):
             # trim image to only see section with road
             X_train = np.array(images)
             y_train = np.array(batch.steering)
-            yield sklearn.utils.shuffle(X_train, y_train)
+            yield shuffle(X_train, y_train)
 
 # compile and train the model using the generator function
 train_generator = generator(df_train, batch_size=32)

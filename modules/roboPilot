@@ -28,7 +28,7 @@ params = {
         }
 
 #%%
-class carDriver(Sequential):
+class pilot(Sequential):
        
     def __init__(self, params):
         Sequential.__init__(self)
@@ -51,8 +51,9 @@ class carDriver(Sequential):
             self.add(Dropout(self.fcDropout))
         self.add(Dense(self.outDim, activation = 'softmax'))
         
-        #%%
-model = carDriver(params)        
+        
+#%%
+model = pilot(params)        
 
 #%%
 

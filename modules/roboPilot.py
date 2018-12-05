@@ -10,22 +10,24 @@ Created on Sun Dec  2 14:39:39 2018
 #import numpy as np
 #import tensorflow as tf
 #from matplotlib import image as mpimg
-from keras import backend as K
+#from keras import backend as K
 from keras.models import Sequential
 from keras.layers import Dense, Flatten, Dropout, BatchNormalization, Lambda, Conv2D, Cropping2D, MaxPooling2D
 
-params = {
-        'input_shape':  (160,320, 3),
-        'cropping': ((50,20), (0,0)),
-        'nFilters': [24, 36, 48, 64],     
-        'kernel': [5,5,5, 3,3], 
-        'maxPoolStride' : [2,2,2,2,2],
-        'convDropout' : 0.2,
-        'FC': [256, 64],
-        'fcDropout': 0.5,
-        'outDim': 10,
-        'batch_size' : 128
-        }
+# ====================== example of params ====================================
+# params = {
+#         'input_shape':  (160,320, 3),
+#         'cropping': ((50,20), (0,0)),
+#         'nFilters': [24, 36, 48, 64],     
+#         'kernel': [5,5,5,3,3], 
+#         'maxPoolStride' : [2,2,2,2,2],
+#         'convDropout' : 0.2,
+#         'FC': [256, 64],
+#         'fcDropout': 0.5,
+#         'outDim': 10,
+#         'batch_size' : 128
+#         }
+# =============================================================================
 
 #%%
 class pilot(Sequential):
@@ -53,8 +55,6 @@ class pilot(Sequential):
         
         
 #%%
-model = pilot(params)        
 
 #%%
 
-model.compile(loss='mse', optimizer='adam')

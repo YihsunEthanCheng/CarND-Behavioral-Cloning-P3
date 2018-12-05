@@ -21,23 +21,27 @@ class behaviorCloneData(object):
         self.df_train, self.df_valid = train_test_split(self.df, test_size=0.2)
         self.x_valid, self.y_valid = self.df2xy(self.df_valid)
         
-    def df2xy(self, dff):
+    def df2xy(self, dff, random_flip = False):
         images = []
+        y = np.array(dff.steering)
         for i in range(len(dff)):
-            images.append(cv2.imread(self.path + dff.center.iloc[i]))
-        return np.array(images), np.array(dff.steering)
+            im = cv2.imread(self.path + dff.center.iloc[i])
+            if (np.random.rand() > 0.5):
+                im = im[:,::-1,:]
+                y[i] = 1.0 - y[i]
+            images.append(im)
+        return np.array(images), y
     
-    def batchGenerator(self, batch_size=32):
+    def trainBatchGenerator(self, batch_size=32):
         while 1: # Loop forever so the generator never terminates
             shuffle(self.df_train)
             for offset in range(0, len(self.df_train), batch_size):
                 df_i = self.df_train[offset:offset+batch_size]
-#                X_train, y_train = self.df2xy(df_i)
-#                yield shuffle(X_train, y_train)
-                yield shuffle(self.df2xy(df_i))
+                yield shuffle(self.df2xy(df_i, True))
 
-    def validSet(self):
-        return self.x_valid, self.y_valid
+    def validationSetGenerator(self):
+        while 1:
+            yield self.x_valid, self.y_valid
         
         
         

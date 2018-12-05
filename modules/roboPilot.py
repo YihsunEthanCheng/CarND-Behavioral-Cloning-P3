@@ -63,8 +63,7 @@ class pilot(Sequential):
     def train(self, data, nEpoch):
         self.fit_generator(
             data.trainBatchGenerator(self.batch_size), 
-            samples_per_epoch = self.batch_size,
-            validation_data = data.validationSetGenerator(),
-            nb_val_samples = len(data.y_valid), 
-            nb_epoch= nEpoch, 
-            verbose=1)
+            steps_per_epoch = data.trainSize//self.batch_size,
+            epochs = nEpoch,
+            validation_data = (data.x_valid, data.y_valid),
+            verbose=2)

@@ -38,23 +38,33 @@ class pilot(Sequential):
         # Layer #1: normalization
         self.add(Lambda(lambda x: (x / 255.0) - 0.5, input_shape= params['input_shape'], output_shape = params['input_shape']))
         self.add(Cropping2D(cropping= params['cropping'], input_shape= params['input_shape']))
-        # Layer #2~5: convolution layers
+        
+        # adds convolution layers
         for i, n in enumerate(self.nFilters):
             self.add(Conv2D(n, (self.kernel[i], self.kernel[i]), padding='same', activation='relu'))
             self.add(BatchNormalization())
             self.add(MaxPooling2D((self.maxPoolStride[i], self.maxPoolStride[i])))
             self.add(Dropout(self.convDropout))
+        
         # flatten layer
         self.add(Flatten())
-        # fully connected layers
+        
+        # adds fully connected layers
         for i, n in enumerate(self.FC):
             self.add(Dense(n, activation = 'relu'))
             self.add(BatchNormalization())
             self.add(Dropout(self.fcDropout))
         self.add(Dense(self.outDim, activation = 'softmax'))
         
+        # add optimizer 
+        self.compile(loss='mse', optimizer='adam')
+        self.summary()
         
-#%%
-
-#%%
-
+    def train(self, data, nEpoch):
+        self.fit_generator(
+            data.trainBatchGenerator(self.batch_size), 
+            samples_per_epoch = self.batch_size,
+            validation_data = data.validationSetGenerator(),
+            nb_val_samples = len(data.y_valid), 
+            nb_epoch= nEpoch, 
+            verbose=1)

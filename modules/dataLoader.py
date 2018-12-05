@@ -20,6 +20,8 @@ class behaviorCloneData(object):
         self.df = pd.read_csv(self.path + 'driving_log.csv')
         self.df_train, self.df_valid = train_test_split(self.df, test_size=0.2)
         self.x_valid, self.y_valid = self.df2xy(self.df_valid)
+        self.trainSize = len(self.df_train)
+        self.validSize = len(self.df_valid)
         
     def df2xy(self, dff, random_flip = False):
         images = []
@@ -39,9 +41,6 @@ class behaviorCloneData(object):
                 df_i = self.df_train[offset:offset+batch_size]
                 yield shuffle(self.df2xy(df_i, True))
 
-    def validationSetGenerator(self):
-        while 1:
-            yield self.x_valid, self.y_valid
         
         
         

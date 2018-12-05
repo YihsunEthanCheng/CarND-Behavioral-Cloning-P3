@@ -25,14 +25,12 @@ params = {
         }
         
 #%%
-
 data = behaviorCloneData('data/download')
-x_valid, y_valid = data.validSet()
-train_generator = data.batchGenerator(params['batch_size'])
+
 
 #%%
-
 model = pilot(params)
 
+#%% 
+model.train(data, 1)
 
-model.compile(loss='mse', optimizer='adam')

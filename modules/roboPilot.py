@@ -13,7 +13,7 @@ Created on Sun Dec  2 14:39:39 2018
 #from keras import backend as K
 from keras.models import Sequential
 from keras.layers import Dense, Flatten, Dropout, BatchNormalization, Lambda, Conv2D, Cropping2D, MaxPooling2D
-
+import numpy as np
 # ====================== example of params ====================================
 # params = {
 #         'input_shape':  (160,320, 3),
@@ -35,9 +35,10 @@ class pilot(Sequential):
     def __init__(self, params):
         Sequential.__init__(self)
         self.__dict__.update(params)
+        
         # Layer #1: normalization
-        self.add(Lambda(lambda x: (x / 255.0) - 0.5, input_shape= params['input_shape'], output_shape = params['input_shape']))
-        self.add(Cropping2D(cropping= params['cropping'], input_shape= params['input_shape']))
+        self.add(Lambda(lambda x: (x / 255.0) - 0.5, input_shape= params['input_shape']))
+        self.add(Cropping2D(cropping= params['cropping'], input_shape=self.input_shape))
         
         # adds convolution layers
         for i, n in enumerate(self.nFilters):
@@ -54,7 +55,7 @@ class pilot(Sequential):
             self.add(Dense(n, activation = 'relu'))
             self.add(BatchNormalization())
             self.add(Dropout(self.fcDropout))
-        self.add(Dense(self.outDim, activation = 'softmax'))
+        self.add(Dense(self.outDim, activation = 'sigmoid'))
         
         # add optimizer 
         self.compile(loss='mse', optimizer='adam')
@@ -67,3 +68,4 @@ class pilot(Sequential):
             epochs = nEpoch,
             validation_data = (data.x_valid, data.y_valid),
             verbose=2)
+

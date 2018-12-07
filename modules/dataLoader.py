@@ -7,7 +7,7 @@ Created on Sun Dec  2 23:16:39 2018
 """
 
 from sklearn.model_selection import train_test_split
-import cv2
+import matplotlib.image as mpimg
 import numpy as np
 import pandas as pd
 from sklearn.utils import shuffle
@@ -27,19 +27,22 @@ class behaviorCloneData(object):
         images = []
         y = np.array(dff.steering)
         for i in range(len(dff)):
-            im = cv2.imread(self.path + dff.center.iloc[i])
+            try:
+                im = mpimg.imread(self.path + dff.center.iloc[i])
+            except:
+                raise ValueError('Error reading image {}'.format(self.path + dff.center.iloc[i]))
             if (np.random.rand() > 0.5):
                 im = im[:,::-1,:]
                 y[i] = 1.0 - y[i]
             images.append(im)
         return np.array(images), y
     
-    def trainBatchGenerator(self, batch_size=32):
+    def trainBatchGenerator(self, pick, batch_size=32):
         while 1: # Loop forever so the generator never terminates
             shuffle(self.df_train)
             for offset in range(0, len(self.df_train), batch_size):
-                df_i = self.df_train[offset:offset+batch_size]
-                yield shuffle(self.df2xy(df_i, True))
+#                yield shuffle(self.df2xy(self.df_train[offset:offset+batch_size], True))
+                yield self.df_train[offset:offset+batch_size]
 
         
         

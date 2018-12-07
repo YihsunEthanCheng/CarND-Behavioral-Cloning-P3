@@ -41,9 +41,5 @@ class behaviorCloneData(object):
         while 1: # Loop forever so the generator never terminates
             shuffle(self.df_train)
             for offset in range(0, len(self.df_train), batch_size):
-#                yield shuffle(self.df2xy(self.df_train[offset:offset+batch_size], True))
-                yield self.df_train[offset:offset+batch_size]
-
-        
-        
+                yield shuffle(self.df2xy(self.df_train[offset:offset+batch_size], True))
         

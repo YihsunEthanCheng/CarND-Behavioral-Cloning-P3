@@ -67,3 +67,11 @@ model.compile(loss='mse', optimizer='adam')
 model.summary()
 
 #%%
+nEpoch = 25
+model.fit_generator(
+    data.trainBatchGenerator(params['batch_size']), 
+    steps_per_epoch = data.trainSize//params['batch_size'],
+    epochs = nEpoch,
+    validation_data = (data.x_valid, data.y_valid),
+    verbose=2)
+

@@ -32,14 +32,24 @@ class behaviorCloneData(object):
             except:
                 raise ValueError('Error reading image {}'.format(self.path + dff.center.iloc[i]))
             if (np.random.rand() > 0.5):
-                im = im[:,::-1,:]
-                y[i] = 1.0 - y[i]
+                im = np.fliplr(im) #[:,::-1,:]
+                y[i] = -y[i]
             images.append(im)
         return np.array(images), y
     
-    def trainBatchGenerator(self, pick, batch_size=32):
+    def trainBatchGenerator(self, batch_size=32):
         while 1: # Loop forever so the generator never terminates
             shuffle(self.df_train)
-            for offset in range(0, len(self.df_train), batch_size):
-                yield shuffle(self.df2xy(self.df_train[offset:offset+batch_size], True))
+            for offset in range(0, batch_size*(len(self.df_train)//batch_size), batch_size):
+                yield self.df2xy(self.df_train[offset:offset+batch_size], True)
+
+    def trainBatchGenerator_unittest(self, batch_size):
+        gen = self.trainBatchGenerator(batch_size)
+        for i in range(5+len(self.df_train)//batch_size):
+            x, y = next(gen)
+            print(x.shape, y.shape)
+        
+        
+        
+        
         

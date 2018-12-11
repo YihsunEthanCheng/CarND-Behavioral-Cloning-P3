@@ -1,125 +1,216 @@
-# Behavioral Cloning Project
+# Behavioral Cloning
+[//]: # (Image References)
 
-[![Udacity - Self-Driving Car NanoDegree](https://s3.amazonaws.com/udacity-sdc/github/shield-carnd.svg)](http://www.udacity.com/drive)
+[image0]: ./examples/track1_scene.jpg "Scene in Track1"
+[image1]: ./examples/track2_scene.jpg "Scene in Track2"
+[image2]: ./examples/track2_trining_curve.png "Track2 training"
 
-Overview
+How to Run This Repository
 ---
-This repository contains starting files for the Behavioral Cloning Project.
+This respository contains the following modules to demonstrate autonomous driving through behavior cloning from video of driving .
+* dataLoader class
+  * Data are collected from the [simulator] and (https://github.com/YihsunEthanCheng/self-driving-car-sim) should be stored in the [data/track1](./data/track1) or [data/track2](./data/track2) folders respectively.
+  * The data class provides following functionalities essential to the training modules.
+    * Batch generator to enable epoch training in keras.
+    * Collection of validation set for monitoring overtraining.
+    * Randomized training batches.
+    * Data augmentation
+        * Each image/steering signal pair are flipped horizontally half of the time. 
+  * The dataLoader can be initiated to load a data set from a folder.  In particular, if track #1 or #2 data are to be loaded, the class can quickly load and encapsulate the data as an object.
+    ```sh
+    trackID = 1
+    data = behaviorCloneData('data/track{}'.format(trackID))
+    ```
 
-In this project, you will use what you've learned about deep neural networks and convolutional neural networks to clone driving behavior. You will train, validate and test a model using Keras. The model will output a steering angle to an autonomous vehicle.
+* Deep network model
+  * The model for cloning driving behavior is chosed a "4-conv + 3-FC network", which can be created by the python module [model.py](./moduals/model.py/) with a specified parameter as below.
+    ```sh
+    params = {
+        'input_shape':  (160,320, 3),
+        'cropping': ((65,20), (0,0)),
+        'nFilters': [24, 36, 48, 60],
+        'convDropout' : 0.1,
+        'nFC': [128, 16],
+        'fcDropout': 0.4,
+        'batch_size' : 128
+        }
+    ```
+  * [model.py](./modules/model.py) contains the function to create the deep network model specified by the parameter "dict" above as,
+    ```sh
+    > model = createModel(params)
+    ```
+  * [model.py](./modules/model.py) also contains a simple training interface to take the "dataLoader" object and train for the number of epochs.
+    ```sh
+    > train(model, data, nEpoch, "trained_model/model.h5")
+    ```
+  * The above simple function and class allow us to create quick training scripts. Training scripts used to clone the driving behavior serve examples.
+    * [run_model_train_track1.py](./run_model_train_track1.py)
+    * [run_model_train_track2.py](./run_model_train_track2.py)   
 
-We have provided a simulator where you can steer a car around a track for data collection. You'll use image data and steering angles to train a neural network and then use this model to drive the car autonomously around the track.
 
-We also want you to create a detailed writeup of the project. Check out the [writeup template](https://github.com/udacity/CarND-Behavioral-Cloning-P3/blob/master/writeup_template.md) for this project and use it as a starting point for creating your own writeup. The writeup can be either a markdown file or a pdf document.
+* Trained models
+  * [Trained models](./trained_models) are available for both tracks presented in the [simulator](https://github.com/YihsunEthanCheng/self-driving-car-sim)
+  * To run the trained model live for track #1, use the following commands.
+     ```sh
+    > python drive.py ./trained_models/track1/24-36-48-60_128-16_ep25.h5
+     ```
+  * To run the trained model live for track #2, use the following commands.
+     ```sh
+    > python drive.py ./trained_models/track2/32-48-64-80_256-32_ep50.h5
+     ```
 
-To meet specifications, the project will require submitting five files: 
-* model.py (script used to create and train the model)
-* drive.py (script to drive the car - feel free to modify this file)
-* model.h5 (a trained Keras model)
-* a report writeup file (either markdown or pdf)
-* video.mp4 (a video recording of your vehicle driving autonomously around the track for at least one full lap)
+* Utitlity functions 
+  * drive.py: take a keras model and send steering commands to the simulator with respect to the scene received from the simulator.
+  * video.py: convert oupout image sequences into a mp4 video.
 
-This README file describes how to output the video in the "Details About Files In This Directory" section.
-
-Creating a Great Writeup
 ---
-A great writeup should include the [rubric points](https://review.udacity.com/#!/rubrics/432/view) as well as your description of how you addressed each point.  You should include a detailed description of the code used (with line-number references and code snippets where necessary), and links to other supporting documents or external references.  You should include images in your writeup to demonstrate how your code works with examples.  
-
-All that said, please be concise!  We're not looking for you to write a book here, just a brief description of how you passed each rubric point, and references to the relevant code :). 
-
-You're not required to use markdown for your writeup.  If you use another method please just submit a pdf of your writeup.
-
-The Project
+The Deep Network Architecture
 ---
-The goals / steps of this project are the following:
-* Use the simulator to collect data of good driving behavior 
-* Design, train and validate a model that predicts a steering angle from image data
-* Use the model to drive the vehicle autonomously around the first track in the simulator. The vehicle should remain on the road for an entire loop around the track.
-* Summarize the results with a written report
+The same deep network archtiecture used in both tasks with the difference in the number of kernels/neurons. Track #2 task is harder, thus needs a larger scale of deep network.
 
-### Dependencies
-This lab requires:
+The network architecture can be described as a "4-convolution + 3-FC" layers of deep network, which is adopted from the Nvidia research report as an adequate starter deep network. The following highlights my customiztion of each layer.
 
-* [CarND Term1 Starter Kit](https://github.com/udacity/CarND-Term1-Starter-Kit)
+* Normalization layer
+  * Scales inputs to [-1,1]
+* cropping layer
+  * Removes distractions in the top/bottom rows of the inputs
+* Conv#1, #2
+  * 5x5 kernels
+  * 2x2 max pooling
+  * Relu 
+  * batch normalization
+  * 0.1 dropout
+* Conv#3, #4
+  * 3x3 kernels
+  * 1x1 max pooling
+  * Relu 
+  * batch normalization
+  * 0.1 dropout rate
+* flatten layer
+* FC #1, #2
+  * batch normalization
+  * 0.4 dropout rate
+  * Relu
+* FC #3
+  * single output as steering control
+  * Tanh activation to clip output within [-1,1]
 
-The lab enviroment can be created with CarND Term1 Starter Kit. Click [here](https://github.com/udacity/CarND-Term1-Starter-Kit/blob/master/README.md) for the details.
+* A Keras' model summary for Track #2 task.
 
-The following resources can be found in this github repository:
-* drive.py
-* video.py
-* writeup_template.md
+  ```sh
+    _________________________________________________________________
+    Layer (type)                 Output Shape              Param #   
+    =================================================================
+    lambda_1 (Lambda)            (None, 160, 320, 3)       0         
+    _________________________________________________________________
+    cropping2d_1 (Cropping2D)    (None, 75, 320, 3)        0         
+    _________________________________________________________________
+    conv2d_1 (Conv2D)            (None, 75, 320, 32)       2432      
+    _________________________________________________________________
+    batch_normalization_1 (Batch (None, 75, 320, 32)       128       
+    _________________________________________________________________
+    max_pooling2d_1 (MaxPooling2 (None, 37, 160, 32)       0         
+    _________________________________________________________________
+    dropout_1 (Dropout)          (None, 37, 160, 32)       0         
+    _________________________________________________________________
+    conv2d_2 (Conv2D)            (None, 37, 160, 48)       38448     
+    _________________________________________________________________
+    batch_normalization_2 (Batch (None, 37, 160, 48)       192       
+    _________________________________________________________________
+    max_pooling2d_2 (MaxPooling2 (None, 18, 80, 48)        0         
+    _________________________________________________________________
+    dropout_2 (Dropout)          (None, 18, 80, 48)        0         
+    _________________________________________________________________
+    conv2d_3 (Conv2D)            (None, 18, 80, 64)        27712     
+    _________________________________________________________________
+    batch_normalization_3 (Batch (None, 18, 80, 64)        256       
+    _________________________________________________________________
+    max_pooling2d_3 (MaxPooling2 (None, 9, 40, 64)         0         
+    _________________________________________________________________
+    dropout_3 (Dropout)          (None, 9, 40, 64)         0         
+    _________________________________________________________________
+    conv2d_4 (Conv2D)            (None, 9, 40, 80)         46160     
+    _________________________________________________________________
+    batch_normalization_4 (Batch (None, 9, 40, 80)         320       
+    _________________________________________________________________
+    max_pooling2d_4 (MaxPooling2 (None, 4, 20, 80)         0         
+    _________________________________________________________________
+    dropout_4 (Dropout)          (None, 4, 20, 80)         0         
+    _________________________________________________________________
+    flatten_1 (Flatten)          (None, 6400)              0         
+    _________________________________________________________________
+    dense_1 (Dense)              (None, 256)               1638656   
+    _________________________________________________________________
+    batch_normalization_5 (Batch (None, 256)               1024      
+    _________________________________________________________________
+    dropout_5 (Dropout)          (None, 256)               0         
+    _________________________________________________________________
+    dense_2 (Dense)              (None, 32)                8224      
+    _________________________________________________________________
+    batch_normalization_6 (Batch (None, 32)                128       
+    _________________________________________________________________
+    dropout_6 (Dropout)          (None, 32)                0         
+    _________________________________________________________________
+    dense_3 (Dense)              (None, 1)                 33        
+    =================================================================
+    Total params: 1,763,713
+    Trainable params: 1,762,689
+    Non-trainable params: 1,024
+    _________________________________________________________________
 
-The simulator can be downloaded from the classroom. In the classroom, we have also provided sample data that you can optionally use to help train your model.
+  ```
+---
+Data collection
+---
+ The success of training is strongly tied up to the diversity of training data set.  To have a successful training session, the following summarizes my data collection strategy.
 
-## Details About Files In This Directory
+ * At least two laps of driving in each direction, this results in 4 laps of data for each track (8x data size by data augmentation through horizontal flippng).
+ * Data cleansing
+    * Data collection are interrupted due to control failures during collection. Withoug removing the failure data, the network often clones bad driving behavior at certain locations.
+* Additional data collection at certain difficult spots could avoid recollection of the entire track.
+* Abundant data are keys to the success to difficult tasks. To train track #2 task, I have collected more than 6 laps of training data with over 400mb of video stream.  
 
-### `drive.py`
+---
+Training
+---
+* Training progress monitoring
+    * Below shows a training session through 50 epochs.
 
-Usage of `drive.py` requires you have saved the trained model as an h5 file, i.e. `model.h5`. See the [Keras documentation](https://keras.io/getting-started/faq/#how-can-i-save-a-keras-model) for how to create this file using the following command:
-```sh
-model.save(filepath)
-```
+     ![alt text][image2]
 
-Once the model has been saved, it can be used with drive.py using this command:
+* Overtraining prevention
+  * dropouts are used in every convolution and fully connected layer with a lower rate at convolutional layer (0.1) vs. fully connected layers (0.4).
+  * With the depth of the network, overfitting is likely to happen. Even with dropout to regularize the training, we can still see overtraining from the plot above. In the plot, the validation error begins to flatten out after 10 epochs while the training error continue to drop.
+  * The overtraining appears in the live testing sesssion.  One can see the jittering tire movements during the driving session while a non-overfitted model shows smooth driving behavior. After testing, I found a 50 epochs in our data collection gives the best performance.
 
-```sh
-python drive.py model.h5
-```
+* batch normalzation
+ * Like dropout, batch normalization is installed in every layer with parameters. It is known to stabilize and speed up the training by removing the scaling and bias in each minibatch. This helps the network to focus and quickly finish the training no more than 50 epochs.
 
-The above command will load the trained model and use the model to make predictions on individual images in real-time and send the predicted angle back to the server via a websocket connection.
 
-Note: There is known local system's setting issue with replacing "," with "." when using drive.py. When this happens it can make predicted steering values clipped to max/min values. If this occurs, a known fix for this is to add "export LANG=en_US.utf8" to the bashrc file.
+Results
+---
+* Track #1
+    * The deep network works seemlessly in track #1 with just 20 epochs of training. The successful compeletion of track #1 can be found at [track #1 video](./examples/track1_output_video.mp4)
 
-#### Saving a video of the autonomous agent
+  | ![alt text][image0] | 
+  |:--:| 
+  | *Scene of autonomous driving in track #1* |
 
-```sh
-python drive.py model.h5 run1
-```
 
-The fourth argument, `run1`, is the directory in which to save the images seen by the agent. If the directory already exists, it'll be overwritten.
+* Track #2
+  * The netowrk seems to have no problem handling the task as well except it is stuck near the very last end as you can see it at [track #2 video](./examples/track2_output_video.mp4)
 
-```sh
-ls run1
+  | ![alt text][image1] | 
+  |:--:| 
+  | *Scene of autonomous driving in track #2* |
 
-[2017-01-09 16:10:23 EST]  12KiB 2017_01_09_21_10_23_424.jpg
-[2017-01-09 16:10:23 EST]  12KiB 2017_01_09_21_10_23_451.jpg
-[2017-01-09 16:10:23 EST]  12KiB 2017_01_09_21_10_23_477.jpg
-[2017-01-09 16:10:23 EST]  12KiB 2017_01_09_21_10_23_528.jpg
-[2017-01-09 16:10:23 EST]  12KiB 2017_01_09_21_10_23_573.jpg
-[2017-01-09 16:10:23 EST]  12KiB 2017_01_09_21_10_23_618.jpg
-[2017-01-09 16:10:23 EST]  12KiB 2017_01_09_21_10_23_697.jpg
-[2017-01-09 16:10:23 EST]  12KiB 2017_01_09_21_10_23_723.jpg
-[2017-01-09 16:10:23 EST]  12KiB 2017_01_09_21_10_23_749.jpg
-[2017-01-09 16:10:23 EST]  12KiB 2017_01_09_21_10_23_817.jpg
-...
-```
 
-The image file name is a timestamp of when the image was seen. This information is used by `video.py` to create a chronological video of the agent driving.
-
-### `video.py`
-
-```sh
-python video.py run1
-```
-
-Creates a video based on images found in the `run1` directory. The name of the video will be the name of the directory followed by `'.mp4'`, so, in this case the video will be `run1.mp4`.
-
-Optionally, one can specify the FPS (frames per second) of the video:
-
-```sh
-python video.py run1 --fps 48
-```
-
-Will run the video at 48 FPS. The default FPS is 60.
-
-#### Why create a video
-
-1. It's been noted the simulator might perform differently based on the hardware. So if your model drives succesfully on your machine it might not on another machine (your reviewer). Saving a video is a solid backup in case this happens.
-2. You could slightly alter the code in `drive.py` and/or `video.py` to create a video of what your model sees after the image is processed (may be helpful for debugging).
-
-### Tips
-- Please keep in mind that training images are loaded in BGR colorspace using cv2 while drive.py load images in RGB to predict the steering angles.
-
-## How to write a README
-A well written README file can enhance your project and portfolio.  Develop your abilities to create professional README files by completing [this free course](https://www.udacity.com/course/writing-readmes--ud777).
+---
+Takaways
+---
+* The 4-conv + 3-FC deep network structure is very capable of handling the two tasks as it appears to show successful completion of track #1 and near successful completion of track 2 in my tests.
+* The incompletion of track 2 is caused by the lack of training data at the stuck location. During the data cleansy stage, I had over trimmed the data due to the "backing-up attemps" to resume the driving.  Should I recollected data at the failure spot, the completion of track 2 is doable.
+* Despite incompletion of track 2 task, the driving behavior shows amazing skills in handling the difficulty in this track after only a few spochs of training.
+* Overtraining is an issue for deep network.  More aggressive regularization might prevent hitting stuck in local minimum but may not be effective. In my opinion, mor sophisicated early stopping might be the key to the success of training.
+* In some overtrained network, the vehicle appears to often latches on the opposite lanes. The observations tells how important the side cameras to stay in the right lane. Personally, I believe a multi-agents colloaboration would be a better solution than burdening an agent with two other cameras having different field of views.
 

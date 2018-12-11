@@ -9,7 +9,7 @@ How to Run This Repository
 ---
 This respository contains the following modules to demonstrate autonomous driving through behavior cloning from video of driving .
 * dataLoader class
-  * Data are collected from the [simulator](https://github.com/YihsunEthanCheng/self-driving-car-sim) should be stored in the [data/track1](./data/track1) or [data/track2](./data/track2) folders respectively.
+  * Data are collected from the [simulator](https://github.com/YihsunEthanCheng/self-driving-car-sim), which is stored in the [data/track1](./data/track1) or [data/track2](./data/track2) folders locally.
   * The data class provides following functionalities essential to the training modules.
     * Batch generator to enable epoch training in keras.
     * Collection of validation set for monitoring overtraining.

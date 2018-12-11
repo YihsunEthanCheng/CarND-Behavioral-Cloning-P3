@@ -9,7 +9,7 @@ How to Run This Repository
 ---
 This respository contains the following modules to demonstrate autonomous driving through behavior cloning from video of driving .
 * dataLoader class
-  * Data are collected from the [simulator](https://github.com/YihsunEthanCheng/self-driving-car-sim), which is stored in the [data/track1](./data/track1) or [data/track2](./data/track2) folders locally.
+  * Data are collected from the [simulator](https://github.com/YihsunEthanCheng/self-driving-car-sim), to be stored in the [data/track1](./data/track1) or [data/track2](./data/track2) folders locally.
   * The data class provides following functionalities essential to the training modules.
     * Batch generator to enable epoch training in keras.
     * Collection of validation set for monitoring overtraining.
@@ -23,7 +23,7 @@ This respository contains the following modules to demonstrate autonomous drivin
     ```
 
 * Deep network model
-  * The model for cloning driving behavior is chosed a "4-conv + 3-FC network", which can be created by the python module [model.py](./moduals/model.py/) with a specified parameter as below.
+  * The model for cloning driving behavior is chosed as a "4-conv + 3-FC network", which can be created by the python module [model.py](./moduals/model.py/) with a specified parameter set as below.
     ```sh
     params = {
         'input_shape':  (160,320, 3),
@@ -39,18 +39,18 @@ This respository contains the following modules to demonstrate autonomous drivin
     ```sh
     > model = createModel(params)
     ```
-  * [model.py](./modules/model.py) also contains a simple training interface to take the "dataLoader" object and train for the number of epochs.
+  * [model.py](./modules/model.py) also contains a simple training interface to take the "dataLoader" object and train for a specified number of epochs.
     ```sh
     > train(model, data, nEpoch, "trained_model/model.h5")
     ```
-  * The above simple function and class allow us to create quick training scripts. Training scripts used to clone the driving behavior serve examples.
+  * The above simple function and class allow us to create quick training scripts. Training scripts below used to clone the driving behavior serve as examples.
     * [run_model_train_track1.py](./run_model_train_track1.py)
     * [run_model_train_track2.py](./run_model_train_track2.py)   
 
 
 * Trained models
   * [Trained models](./trained_models) are available for both tracks presented in the [simulator](https://github.com/YihsunEthanCheng/self-driving-car-sim)
-  * To run the trained model live for track #1, use the following commands.
+  * To run the trained model live for track #1, use the following trained models.
      ```sh
     > python drive.py ./trained_models/track1/24-36-48-60_128-16_ep25.h5
      ```
@@ -164,9 +164,9 @@ Data collection
 ---
  The success of training is strongly tied up to the diversity of training data set.  To have a successful training session, the following summarizes my data collection strategy.
 
- * At least two laps of driving in each direction, this results in 4 laps of data for each track (8x data size by data augmentation through horizontal flippng).
+ * At least two laps of driving in each direction, this results in 4 laps of data for each track (8x data size by data augmentation through horizontal flipping).
  * Data cleansing
-    * Data collection are interrupted due to control failures during collection. Withoug removing the failure data, the network often clones bad driving behavior at certain locations.
+    * Data collection are often interrupted due to failures during collection. Withoug removing the failure data, the network often latches on bad driving behavior at certain locations.
 * Additional data collection at certain difficult spots could avoid recollection of the entire track.
 * Abundant data are keys to the success to difficult tasks. To train track #2 task, I have collected more than 6 laps of training data with over 400mb of video stream.  
 
@@ -208,9 +208,9 @@ Results
 ---
 Takaways
 ---
-* The 4-conv + 3-FC deep network structure is very capable of handling the two tasks as it appears to show successful completion of track #1 and near successful completion of track 2 in my tests.
-* The incompletion of track 2 is caused by the lack of training data at the stuck location. During the data cleansy stage, I had over trimmed the data due to the "backing-up attemps" to resume the driving.  Should I recollected data at the failure spot, the completion of track 2 is doable.
-* Despite incompletion of track 2 task, the driving behavior shows amazing skills in handling the difficulty in this track after only a few spochs of training.
+* The 4-conv + 3-FC deep network structure is very capable of handling the two tasks as it appears to show successful completion of track #1 and near successful completion of track #2 in my tests.
+* The incompletion of track #2 is caused by the lack of training data at the stuck location. During the data cleansy stage, I had over trimmed the data due to the "backing-up attemps" to resume the driving.  Should I recollected data at the failure spot, the completion of track #2 is expectable.
+* Despite incompletion of track #2 task, the driving behavior shows amazing skills in handling the difficulty in this track after only a few spochs of training. This leads me to believe the success is achievable with proper data.
 * Overtraining is an issue for deep network.  More aggressive regularization might prevent hitting stuck in local minimum but may not be effective. In my opinion, mor sophisicated early stopping might be the key to the success of training.
-* In some overtrained network, the vehicle appears to often latches on the opposite lanes. The observations tells how important the side cameras to stay in the right lane. Personally, I believe a multi-agents colloaboration would be a better solution than burdening an agent with two other cameras having different field of views.
+* In some overtrained network, the vehicle appears to often latches on the opposite lanes. The observations tell me how important the side cameras are to stay in the right lane. Personally, I believe a multi-agents colloaboration would be a better solution than burdening an agent with two other cameras having different field of views.
 

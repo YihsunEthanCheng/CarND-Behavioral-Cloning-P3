@@ -5,8 +5,12 @@
 [image1]: ./examples/track2_scene.jpg "Scene in Track2"
 [image2]: ./examples/track2_trining_curve.png "Track2 training"
 
-How to Run This Repository
----
+## Objectives
+
+To clone driving behavior using deep learning
+
+## How to Run This Repository
+
 This respository contains the following modules to demonstrate autonomous driving through behavior cloning from video of driving .
 * dataLoader class
   * Data are collected from the [simulator](https://github.com/YihsunEthanCheng/self-driving-car-sim), to be stored in the [data/track1](./data/track1) or [data/track2](./data/track2) folders locally.
@@ -63,9 +67,9 @@ This respository contains the following modules to demonstrate autonomous drivin
   * drive.py: take a keras model and send steering commands to the simulator with respect to the scene received from the simulator.
   * video.py: convert oupout image sequences into a mp4 video.
 
----
-The Deep Network Architecture
----
+
+## The Deep Network Architecture
+
 The same deep network archtiecture used in both tasks with the difference in the number of kernels/neurons. Track #2 task is harder, thus needs a larger scale of deep network.
 
 The network architecture can be described as a "4-convolution + 3-FC" layers of deep network, which is adopted from the Nvidia research report as an adequate starter deep network. The following highlights my customiztion of each layer.
@@ -159,9 +163,9 @@ The network architecture can be described as a "4-convolution + 3-FC" layers of 
     _________________________________________________________________
 
   ```
----
-Data collection
----
+
+## Data collection
+
  The success of training is strongly tied up to the diversity of training data set.  To have a successful training session, the following summarizes my data collection strategy.
 
  * At least two laps of driving in each direction, this results in 4 laps of data for each track (8x data size by data augmentation through horizontal flipping).
@@ -170,9 +174,9 @@ Data collection
 * Additional data collection at certain difficult spots could avoid recollection of the entire track.
 * Abundant data are keys to the success to difficult tasks. To train track #2 task, I have collected more than 6 laps of training data with over 400mb of video stream.  
 
----
-Training
----
+
+## Training
+
 * Training progress monitoring
     * Below shows a training session through 50 epochs.
 
@@ -187,8 +191,8 @@ Training
  * Like dropout, batch normalization is installed in every layer with parameters. It is known to stabilize and speed up the training by removing the scaling and bias in each minibatch. This helps the network to focus and quickly finish the training no more than 50 epochs.
 
 
-Results
----
+## Results
+
 * Track #1
     * The deep network works seemlessly in track #1 with just 20 epochs of training. The successful compeletion of track #1 can be found at [track #1 video](./examples/track1_output_video.mp4)
 
@@ -205,9 +209,9 @@ Results
   | *Scene of autonomous driving in track #2* |
 
 
----
-Takaways
----
+
+## Takaways
+
 * The 4-conv + 3-FC deep network structure is very capable of handling the two tasks as it appears to show successful completion of track #1 and near successful completion of track #2 in my tests.
 * The incompletion of track #2 is caused by the lack of training data at the stuck location. During the data cleansy stage, I had over trimmed the data due to the "backing-up attemps" to resume the driving.  Should I recollected data at the failure spot, the completion of track #2 is expectable.
 * Despite incompletion of track #2 task, the driving behavior shows amazing skills in handling the difficulty in this track after only a few spochs of training. This leads me to believe the success is achievable with proper data.
